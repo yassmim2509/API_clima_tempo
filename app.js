@@ -23,24 +23,44 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const traducaoClima = {
     "few clouds ": "Poucas nuvens",
-    "scattered clouds":"Nuvens dispersas"
+    "scattered clouds":"Nuvens dispersas",  
+    "overcast clouds" : "Nublado",
+    "broken clouds" : "Sem nuvens",
+    "clear sky" : "céu claro",
+    "moderate rain" : "chuva moderada",
+    "light snow" : "Pouca neve",
+    "haze" : "neblina",
+    "clear" : "Céu limpo",
+    "clouds" : "Céu parcialmente nublado",
+    "drizzle" : "Chuva fraca",
+    "rain" : "Chuva moderada a forte",
+    "thunderstorm" : "Tempestade com trovões",
+    "snow" : "Neve",
+    "mist": "Névoa",
+    "smoke" : "Fumaça no ar",
+    "dust ": "Poeira suspensa no ar",
+    "fog ": "Neblina densa",
+    "sand ": "Areia no ar",
+    "ash" : "Cinzas vulcânicas suspensas no ar",
+    "squall": "Rajadas de vento súbitas e intensas"
+
 }
 
-app.get("/climatempo/:cidade", async (req,res) => {
+app.get('/climatempo/:cidade', async (req,res) => {
     const city = req.params.cidade;
     try{
-        const reponde = await axaios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric`)
-        if(reponde.status === 200){
-            const clima = traducaoClima[reponde.data.weather[0].descripition] || reponde.data.weather[0].descripition;
+        const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric`)
+        if(response.status === 200){
+            const clima = traducaoClima[response.data.weather[0].description] || response.data.weather[0].description;
             const weatherData ={
-                Temperatura: responde.data.main.temp,
-                Unidade: responde.data.main.humidity,
-                VelocidadeDoVento: responde.data.wind.speed,
+                Temperatura: response.data.main.temp,
+                Umidade: response.data.main.humidity,
+                VelocidadeDoVento: response.data.wind.speed,
                 Clima: clima
-            };
+            }
             res.send(weatherData);
         }else{
-            res.status(responde.status).send({erro: 'Erro ao obter dados materológicos'})
+            res.status(response.status).send({erro: 'Erro ao obter dados materológicos'})
         }
 }catch(error){
 res.status(500).send({erro:'Erro ao obter dados meteorológicos', error});
